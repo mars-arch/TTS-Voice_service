@@ -12,7 +12,11 @@ apt-get install -y ca-certificates curl gnupg
 # 2. Add Docker's GPG key
 echo "Adding Docker's GPG key..."
 install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+if [ ! -f /etc/apt/keyrings/docker.gpg ]; then
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+else
+    echo "Docker GPG key already exists, skipping."
+fi
 
 # 3. Add Docker repository
 echo "Adding Docker repository..."
@@ -27,7 +31,13 @@ apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 
 # 5. Start and Test Docker
 echo "Starting Docker daemon..."
-dockerd > /var/log/dockerd.log 2>&1 &
+if ! pgrep -x "dockerd" > /dev/null; then
+    dockerd > /var/log/dockerd.log 2>&1 &
+    echo "Waiting for Docker daemon to start..."
+    sleep 10 # Wait for docker to start
+else
+    echo "Docker daemon is already running."
+fi
 sleep 5 # Wait for docker to start
 
 echo "Testing Docker installation..."
@@ -35,11 +45,16 @@ docker run hello-world
 
 # 6. Install NVIDIA Container Toolkit
 echo "Installing NVIDIA Container Toolkit..."
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
-  && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-  && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
-    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-    tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+if [ ! -f /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg ]; then
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+      && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+      && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+        sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+        tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+else
+    echo "NVIDIA GPG key and repo list already exist, skipping."
+fi
+  
 
 apt-get update
 apt-get install -y nvidia-container-toolkit

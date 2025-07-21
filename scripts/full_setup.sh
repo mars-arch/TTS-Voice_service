@@ -63,7 +63,21 @@ apt-get install -y nvidia-container-toolkit
 # 7. Configure Docker to use the NVIDIA runtime
 echo "Configuring Docker to use NVIDIA runtime..."
 nvidia-ctk runtime configure --runtime=docker
-echo "Docker daemon is already running."
+
+echo "Restarting Docker daemon to apply NVIDIA runtime configuration..."
+# Kill the existing docker daemon process to ensure a clean restart
+pkill dockerd
+sleep 5 # Give it a moment to shut down before restarting
+
+# Start the daemon again
+dockerd > /var/log/dockerd.log 2>&1 &
+
+# Wait for the Docker socket to be available again
+while [ ! -S /var/run/docker.sock ]; do
+    echo "Waiting for Docker socket after restart..."
+    sleep 1
+done
+echo "Docker daemon restarted successfully."
 
 # 8. Test Docker and NVIDIA Integration
 echo "Testing Docker installation..."

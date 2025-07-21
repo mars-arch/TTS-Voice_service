@@ -17,44 +17,37 @@ This project combines a powerful F5-TTS voice cloning model on the backend with 
 
 ### Prerequisites
 
-- [Docker](https://www.docker.com/products/docker-desktop/) installed and running.
-- An NVIDIA GPU with CUDA drivers is required for the voice cloning model.
+- An Ubuntu-based Linux distribution (e.g., Ubuntu 20.04, 22.04).
+- An NVIDIA GPU with corresponding drivers installed.
 
-### Instructions
+### 1. First-Time Machine Setup
 
-1.  **Clone the Repository**
+If you are setting up a new machine, run the `full_setup.sh` script. This only needs to be done once per machine. It will install Docker, the NVIDIA Container Toolkit, and all other necessary dependencies.
 
-    ```bash
-    git clone https://github.com/your-username/Voice-Service.git
-    cd Voice-Service
-    ```
+```bash
+chmod +x scripts/full_setup.sh
+sudo ./scripts/full_setup.sh
+```
 
-2.  **Set Up Environment Variables**
+After the script completes, it's a good idea to reboot your machine to ensure all changes take effect:
 
-    Navigate to the frontend directory, create a `.env.local` file from the example, and add your Groq API key.
+```bash
+sudo reboot
+```
 
-    ```bash
-    cd ux/voicefe
-    cp .env.example .env.local
-    ```
+### 2. Running the Application
 
-    Now, open `.env.local` with a text editor and replace `"YOUR_GROQ_API_KEY_HERE"` with your actual Groq API key.
+Once your machine is set up, you can start the application with a single command. This script will handle everything, including prompting for your Groq API key if it's not already configured.
 
-3.  **Launch the Application**
+```bash
+./scripts/start_app.sh
+```
 
-    Return to the root `Voice-Service` directory and run the application using Docker Compose. The `--build` flag is only needed the first time or when code changes.
+The first time you run this, it will build the Docker containers, which may take several minutes. Subsequent launches will be much faster.
 
-    ```bash
-    cd ../../ # Return to the root directory from ux/voicefe
-    docker-compose up --build
-    ```
+Once the services are running, the frontend will be accessible at [http://localhost:3000](http://localhost:3000).
 
-    The initial build may take some time as it needs to download the model files.
 
-4.  **Access the Application**
-
-    Once the containers are running, you can access the web interface in your browser at:
-    [**http://localhost:3000**](http://localhost:3000)
 
 ---
 

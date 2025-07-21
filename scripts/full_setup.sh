@@ -66,7 +66,7 @@ nvidia-ctk runtime configure --runtime=docker
 
 echo "Restarting Docker daemon to apply NVIDIA runtime configuration..."
 # Kill the existing docker daemon process to ensure a clean restart
-pkill dockerd
+pkill dockerd || true
 sleep 5 # Give it a moment to shut down before restarting
 
 # Start the daemon again

@@ -1,0 +1,41 @@
+
+
+services:
+  frontend:
+    build:
+      context: ./ux/voicefe
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./ux/voicefe:/app
+      - ./F5-TTS:/app/F5-TTS
+      - voices_storage:/app/voices
+      # Exclude node_modules from being mounted to use the container's version
+      - /app/ux/voicefe/node_modules 
+    env_file:
+      - ./ux/voicefe/.env.local
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./F5-TTS
+      dockerfile: Dockerfile
+    command: ["f5-tts_infer-cli", "--webui", "true", "--host", "0.0.0.0", "--port", "8080"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./F5-TTS:/workspace/F5-TTS
+      - huggingface_cache:/root/.cache/huggingface/hub
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  huggingface_cache:
+  voices_storage:

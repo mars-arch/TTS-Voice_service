@@ -5,6 +5,7 @@ import tempfile
 import torch
 import soundfile as sf
 from flask import Flask, request, jsonify, send_file
+from cached_path import cached_path
 
 # --- Adapted from infer_gradio.py ---
 from f5_tts.infer.utils_infer import (
@@ -21,7 +22,8 @@ ema_model = None
 
 def load_f5tts():
     # Using default F5-TTS v1 model
-    ckpt_path = "hf://SWivid/F5-TTS/F5TTS_v1_Base/model_1250000.safetensors"
+    hf_path = "hf://SWivid/F5-TTS/F5TTS_v1_Base/model_1250000.safetensors"
+    ckpt_path = str(cached_path(hf_path))
     model_cfg = dict(dim=1024, depth=22, heads=16, ff_mult=2, text_dim=512, conv_layers=4)
     return load_model(DiT, model_cfg, ckpt_path)
 

@@ -1,3 +1,14 @@
+---
+title: F5-TTS API Server
+emoji: 🎙️
+colorFrom: blue
+colorTo: green
+sdk: python
+sdk_version: "3.10"
+app_file: F5-TTS/src/f5_tts/infer/api_server.py
+app_port: 8080
+---
+
 # F5-TTS: A Fairytaler that Fakes Fluent and Faithful Speech with Flow Matching
 
 [![python](https://img.shields.io/badge/Python-3.10-brightgreen)](https://github.com/SWivid/F5-TTS)
